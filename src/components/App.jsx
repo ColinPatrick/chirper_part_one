@@ -1,93 +1,58 @@
-import React, { Component, Fragment } from 'react';
-import Navbar from './Navbar';
-import MainPage from './MainPage';
-import CreateChirp from './CreateChirp';
+import React, { Fragment, useState } from 'react';
+import Timeline from './Timeline';
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            chirps: [
-                {
-                    userName: "Abraham Lincoln",
-                    chirpText: "@George Washington you should check out The Expanse. It's dope and so are the books.",
-                    chirpId: 3,
-                    chirpDate: "Thu Feb 25 2021 05:15"
-                },
-                {  
-                    userName: "George Washington",
-                    chirpText: "Yo what's a good show right now? Looking for something to binge. It has to stay good though none of that GOT business.",
-                    chirpId: 2,
-                    chirpDate: "Thu Feb 25 2021 03:32"
-                },
-                {
-                    userName: "John Hancock",
-                    chirpText: "Man you guys know that feeling when you KNOW you gotta to be working and signing stuff but you still spend the whole day on reddit doing nothing?",
-                    chirpId: 1,
-                    chirpDate: "Thu Feb 25 2021 01:45"
-                },
-            ],
-            pageToggle: "home",
-            chirpCount: 3
+const App = () => {
+    const [userInput, setUserInput] = useState('');
+    const [msgInput, setMsgInput] = useState('');
+    const [chirps, setChirps] = useState([
+        {
+            username: 'Abraham Lincoln',
+            message: "@George Washington you should check out The Expanse. It's dope and so are the books."
+        },
+        {
+            username: 'George Washington',
+            message: "Yo what's a good show right now? Looking for something to binge. It has to stay good though none of that GOT business.",
+        },
+        {
+            username: 'John Hancock',
+            message: "Man you guys know that feeling when you KNOW you gotta to be working and signing stuff but you still spend the whole day on reddit doing nothing?"
         }
+    ]);
 
-        this.handlePageToggleHome = this.handlePageToggleHome.bind(this);
-        this.handlePageToggleCreate = this.handlePageToggleCreate.bind(this);
-        this.handleNewChirps = this.handleNewChirps.bind(this);
+    let clearInputs = () => {
+        setUserInput('');
+        setMsgInput('');
     };
 
-    handlePageToggleHome() {
-        this.setState({
-            pageToggle: "home"
-        });
+    let handleSubmit = () => {
+        let newChirp = {
+            username: userInput,
+            message: msgInput
+        };
+
+        setChirps([newChirp, ...chirps]);
+        clearInputs();
     };
 
-    handlePageToggleCreate() {
-        this.setState({
-            pageToggle: "create"
-        });
-    };
+    let chirpDisplay = chirps.map((chirp, id) => <Timeline key={id} chirp={chirp} />);
 
-    handleNewChirps(chirp) {
-        let date = new Date();
-        chirp.chirpDate = date.toString();
-        chirp.chirpId = this.state.chirpCount + 1;
-        this.setState({
-            chirps: [chirp, ...this.state.chirps],
-            pageToggle: "home",
-            chirpCount: this.state.chirpCount + 1
-        });
-    }
+    return (
+        <>
+            <div className="row d-flex justify-content-center">
+                <div className="col-3 mt-4 d-flex justify-content-center">
+                    <input className="rounded shadow" type="text" id="un-input" value={userInput} placeholder="Username:" onChange={(e) => setUserInput(e.target.value)} />
+                </div>
+                <div className="col-3 mt-4 d-flex justify-content-center">
+                    <input className="rounded shadow" type="text" id="msg-input" value={msgInput} placeholder="Whatcha got??:" onChange={(e) => setMsgInput(e.target.value)}/>
+                </div>
+                <div className="col-3 mt-4 d-flex justify-content-center">
+                    <button className="btn btn-primary" onClick={handleSubmit}>Chirp it!</button>
+                </div>
+            </div>
 
-    render() {
-        if (this.state.pageToggle === "home") {
-            return (
-                <Fragment>
-                    <Navbar 
-                        handlePageToggleHome={this.handlePageToggleHome}
-                        handlePageToggleCreate={this.handlePageToggleCreate} 
-                    /> 
-                    <MainPage 
-                    chirps={this.state.chirps}
-                    editHandler={this.handleChirpEdit} 
-                    />
-                </Fragment>
-            );
-        } else if (this.state.pageToggle === "create") {
-            return (
-                <Fragment>
-                    <Navbar 
-                        handlePageToggleHome={this.handlePageToggleHome}
-                        handlePageToggleCreate={this.handlePageToggleCreate} 
-                    />
-                    <CreateChirp
-                        addChirp={this.handleNewChirps}                      
-                    />
-                </Fragment> 
-            );
-        };       
-    };
+            {chirpDisplay}
+        </>        
+    );
 };
- 
+
 export default App;
